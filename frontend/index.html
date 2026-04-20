@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intruder Detection System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🏠 Smart Home Intruder Monitoring</h1>
+    <span id="connection-badge" class="badge badge-connecting">Connecting…</span>
+  </header>
+
+  <main>
+    <!-- ── Status card ──────────────────────────────────────── -->
+    <section class="card" id="status-card">
+      <h2>System Status</h2>
+      <div class="state-display">
+        <span id="state-icon" class="state-icon">⬜</span>
+        <span id="state-label" class="state-label">—</span>
+      </div>
+      <p class="last-updated">Last updated: <span id="last-updated-time">—</span></p>
+    </section>
+
+    <!-- ── Position card ────────────────────────────────────── -->
+    <section class="card" id="position-card">
+      <h2>Intruder Position</h2>
+      <div class="position-grid">
+        <div class="position-cell" id="pos-left">
+          <span class="pos-arrow">◀</span>
+          <span class="pos-name">LEFT</span>
+          <span class="pos-dist" id="dist-left">—</span>
+        </div>
+        <div class="position-cell" id="pos-center">
+          <span class="pos-arrow">⬆</span>
+          <span class="pos-name">CENTER</span>
+          <span class="pos-dist" id="dist-center">—</span>
+        </div>
+        <div class="position-cell" id="pos-right">
+          <span class="pos-arrow">▶</span>
+          <span class="pos-name">RIGHT</span>
+          <span class="pos-dist" id="dist-right">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Servo card ───────────────────────────────────────── -->
+    <section class="card" id="servo-card">
+      <h2>Servo Direction</h2>
+      <div class="servo-visualizer">
+        <div class="servo-arc"></div>
+        <div class="servo-needle" id="servo-needle"></div>
+        <div class="servo-labels">
+          <span>30°</span>
+          <span>90°</span>
+          <span>150°</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Camera placeholder card ──────────────────────────── -->
+    <section class="card" id="camera-card">
+      <h2>📷 Camera Feed</h2>
+      <div class="camera-placeholder">
+        <p>
+          The Z-IOT camera does not provide a direct stream URL.<br />
+          Live video is accessible through the manufacturer's mobile app only.
+        </p>
+        <p class="camera-note">
+          To integrate a camera feed, configure an RTSP-capable camera and
+          update <code>app.js</code> with the stream URL.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── History log ──────────────────────────────────────── -->
+    <section class="card wide-card" id="history-card">
+      <h2>Event Log</h2>
+      <div class="log-container">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>State</th>
+              <th>Position</th>
+              <th>Left (cm)</th>
+              <th>Center (cm)</th>
+              <th>Right (cm)</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <tr><td colspan="6" class="empty-row">Waiting for data…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Intruder Detection &amp; Tracking System · Arduino + Python + Web</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

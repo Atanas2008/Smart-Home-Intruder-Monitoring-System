@@ -1,0 +1,294 @@
+/* ─────────────────────────────────────────────────────────────────
+   Intruder Detection System – Stylesheet
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Reset & custom properties ──────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #0d1117;
+  --surface:     #161b22;
+  --surface-alt: #1f2937;
+  --border:      #30363d;
+  --text:        #e6edf3;
+  --text-muted:  #8b949e;
+  --accent:      #58a6ff;
+
+  /* State colours */
+  --idle:      #3fb950;  /* green  */
+  --detected:  #d29922;  /* yellow */
+  --tracking:  #58a6ff;  /* blue   */
+  --alert:     #f85149;  /* red    */
+
+  --radius: 8px;
+  --gap:    20px;
+}
+
+/* ── Base ────────────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ── Connection badge ────────────────────────────────────────────── */
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-connecting { background: var(--surface-alt); color: var(--text-muted); }
+.badge-online     { background: #1a4731;             color: var(--idle);       }
+.badge-offline    { background: #3d1a1a;             color: var(--alert);      }
+
+/* ── Main grid ───────────────────────────────────────────────────── */
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--gap);
+  padding: var(--gap);
+  align-content: start;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+/* Full-width card (history log) */
+.wide-card {
+  grid-column: 1 / -1;
+}
+
+/* ── Status card ─────────────────────────────────────────────────── */
+.state-display {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.state-icon  { font-size: 2.4rem; line-height: 1; }
+.state-label {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.last-updated {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* State colour classes applied via JS */
+.state-IDLE     .state-label { color: var(--idle);      }
+.state-DETECTED .state-label { color: var(--detected);  }
+.state-TRACKING .state-label { color: var(--tracking);  }
+.state-ALERT    .state-label { color: var(--alert);     }
+
+.state-IDLE     .state-icon::after { content: "🟢"; }
+.state-DETECTED .state-icon::after { content: "🟡"; }
+.state-TRACKING .state-icon::after { content: "🔵"; }
+.state-ALERT    .state-icon::after { content: "🔴"; }
+
+/* ── Position card ───────────────────────────────────────────────── */
+.position-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.position-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--surface-alt);
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.position-cell.active {
+  border-color: var(--alert);
+  background: #2a1a1a;
+}
+
+.pos-arrow { font-size: 1.4rem; }
+.pos-name  { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
+.pos-dist  { font-size: 1rem; font-weight: 600; }
+
+/* ── Servo visualizer ────────────────────────────────────────────── */
+.servo-visualizer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.servo-arc {
+  width: 160px;
+  height: 80px;
+  border-radius: 80px 80px 0 0;
+  border: 3px solid var(--border);
+  border-bottom: none;
+  position: relative;
+  margin-top: 10px;
+}
+
+.servo-needle {
+  width: 3px;
+  height: 70px;
+  background: var(--accent);
+  border-radius: 2px;
+  transform-origin: bottom center;
+  transform: rotate(0deg);   /* updated by JS */
+  transition: transform 0.4s ease;
+  margin-top: -70px;
+  position: relative;
+  left: calc(50% - 1.5px);
+}
+
+.servo-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 160px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+/* ── Camera placeholder ──────────────────────────────────────────── */
+.camera-placeholder {
+  background: var(--surface-alt);
+  border-radius: var(--radius);
+  border: 2px dashed var(--border);
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.camera-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.camera-note code {
+  background: var(--bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--accent);
+}
+
+/* ── History table ───────────────────────────────────────────────── */
+.log-container {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: var(--surface-alt); }
+
+tbody td {
+  padding: 7px 10px;
+  color: var(--text);
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 20px !important;
+}
+
+/* State cell colour */
+td.state-IDLE     { color: var(--idle);     }
+td.state-DETECTED { color: var(--detected); }
+td.state-TRACKING { color: var(--tracking); }
+td.state-ALERT    { color: var(--alert);    }
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+footer {
+  padding: 12px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Alert pulse animation ───────────────────────────────────────── */
+@keyframes alertPulse {
+  0%   { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0.5); }
+  70%  { box-shadow: 0 0 0 12px rgba(248, 81, 73, 0);   }
+  100% { box-shadow: 0 0 0 0   rgba(248, 81, 73, 0);   }
+}
+
+#status-card.alert-active {
+  animation: alertPulse 1.2s infinite;
+  border-color: var(--alert);
+}
